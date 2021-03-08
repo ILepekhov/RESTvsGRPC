@@ -45,3 +45,12 @@ message MeteoriteLanding {
 message MeteoriteLandingList {
 	repeated MeteoriteLanding MeteoriteLandings = 1;
 }
+
+enum RequestType {
+	REQUEST_TYPE_UNSPECIFIED = 0;
+	REQUEST_TYPE_GET_SMALL_PAYLOAD = 1;
+	REQUEST_TYPE_GET_LARGE_PAYLOAD = 2;
+	REQUEST_TYPE_POST_LARGE_PAYLOAD = 3;
+	REQUEST_TYPE_GET_LARGE_PAYLOAD_MULTIPART = 4;
+	REQUEST_TYPE_POST_LARGE_PAYLOAD_MULTIPART = 5;
+}

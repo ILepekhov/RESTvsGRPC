@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Validators;
 using ModelLibrary.Data;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,13 +11,20 @@ namespace RESTvsGRPC
     [AsciiDocExporter]
     [CsvExporter]
     [HtmlExporter]
-    public class BenchmarkHarness
+    public class BenchmarkHarness : IDisposable
     {
         [Params(100, 200)]
         public int IterationCount;
 
         readonly RESTClient restClient = new RESTClient();
         readonly GRPCClient grpcClient = new GRPCClient();
+        readonly NetMQClient netMQClient = new NetMQClient();
+
+        ~BenchmarkHarness()
+        {
+            Dispose();
+            Console.WriteLine("<<<============================BenchmarkHarness DISPOSED============================>>>");
+        }
 
         [Benchmark]
         public async Task RestGetSmallPayloadAsync()
@@ -79,6 +87,56 @@ namespace RESTvsGRPC
             {
                 await grpcClient.PostLargePayloadAsync(MeteoriteLandingData.GrpcMeteoriteLandingList);
             }
+        }
+
+        [Benchmark]
+        public async Task NetMQGetSmallPayloadAsync()
+        {
+            for (int i = 0; i < IterationCount; i++)
+            {
+                await netMQClient.GetSmallPayloadAsync();
+            }
+        }
+
+        [Benchmark]
+        public async Task NetMQGetLargePayloadAsync()
+        {
+            for (int i = 0; i < IterationCount; i++)
+            {
+                await netMQClient.GetLargePayloadAsync();
+            }
+        }
+
+        [Benchmark]
+        public async Task NetMQPostLargePayloadAsync()
+        {
+            for (int i = 0; i < IterationCount; i++)
+            {
+                await netMQClient.PostLargePayloadAsync(MeteoriteLandingData.GrpcMeteoriteLandingList);
+            }
+        }
+
+        [Benchmark]
+        public async Task NetMQGetLargePayloadMultipartAsync()
+        {
+            for (int i = 0; i < IterationCount; i++)
+            {
+                await netMQClient.GetLargePayloadMultipartAsync();
+            }
+        }
+
+        [Benchmark]
+        public async Task NetMQPostLargePayloadMultipartAsync()
+        {
+            for (int i = 0; i < IterationCount; i++)
+            {
+                await netMQClient.PostLargePayloadMultipartAsync(MeteoriteLandingData.GrpcMeteoriteLandings);
+            }
+        }
+
+        public void Dispose()
+        {
+            netMQClient.Dispose();
         }
     }
 
